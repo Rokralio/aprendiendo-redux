@@ -1,39 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import Card from '../card/Card'
 import styles from './home.module.css'
-import axios from 'axios'
+import { connect } from "react-redux";//conecta nuestro componente con redux.
+import { removeCharacterAction } from "../../redux/charsDuck";
 
-let URL = "https://rickandmortyapi.com/api"
-
-export default function Home() {
-
-    let [chars, setChars] = useState([])
-
-    useEffect(() => {
-        getCharacters()
-    }, [])
-
-    function nextChar() {
-        chars.shift()
-        if (!chars.length) {
-            //get more characters
-        }
-        setChars([...chars])
-    }
+function Home({ chars, removeCharacterAction }) {
 
     function renderCharacter() {
-        let char = chars[0]
+        let char = chars[0];
         return (
-            <Card leftClick={nextChar} {...char} />
+            <Card leftClick={nexCharacter} { ...char } />
         )
-    }
+    };
 
-    function getCharacters() {
-        return axios.get(`${URL}/character`)
-            .then(res => {
-                setChars(res.data.results)
-            })
-    }
+    function nexCharacter(){
+        removeCharacterAction();
+    };
+
 
     return (
         <div className={styles.container}>
@@ -42,5 +25,18 @@ export default function Home() {
                 {renderCharacter()}
             </div>
         </div>
-    )
+    );
+};
+
+function mapState(state){
+    return {
+        chars: state.characters.array
+    }
 }
+
+//connect se usas de 2 formas 
+
+//1:pedir datos que ya tiene el reducer / store (sacarle datos a redux)
+export default connect(mapState, { removeCharacterAction })(Home)
+
+//2:despacha acciones para que como props las podamos usar.
