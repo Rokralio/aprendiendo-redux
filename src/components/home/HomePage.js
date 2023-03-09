@@ -17,7 +17,6 @@ function Home({ chars, removeCharacterAction }) {
         removeCharacterAction();
     };
 
-
     return (
         <div className={styles.container}>
             <h2>Personajes de Rick y Morty</h2>

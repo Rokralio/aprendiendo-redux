@@ -34,7 +34,7 @@ export default function reducer (state = initialData, action) {
 }
 //actions (thunks)
 export let removeCharacterAction = () => (dispatch, getState)=>{
-  let {array} = getState().characters
+  let { array } = getState().characters
   array.shift()
   dispatch({
     type: REMOVE_CHARACTER,
