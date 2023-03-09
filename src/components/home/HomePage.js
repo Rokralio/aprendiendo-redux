@@ -11,13 +11,13 @@ function Home({ addToFavoritesAction, chars, removeCharacterAction }) {
         return (
             <Card 
             rightClick={addFav}
-            leftClick={nexCharacter} 
+            leftClick={nextCharacter} 
             { ...char }
             />
         )
     };
 
-    function nexCharacter(){
+    function nextCharacter(){
         removeCharacterAction();
     };
 
