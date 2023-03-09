@@ -1,4 +1,5 @@
 import { loginWithGoogle, signOutGoogle } from '../firebase'
+import { retreiveFavs } from "./charsDuck";
 
 //constantes
 let initialData = {
@@ -72,8 +73,10 @@ export let doGoogleLoginAction = ()=> (dispatch, getState) =>{
         }
       })
       saveStorage(getState())
+      retreiveFavs()(dispatch, getState)
     })
     .catch(e=>{
+      console.log(e)
       dispatch({
         type: LOGIN_ERROR,
         payload: e.message
