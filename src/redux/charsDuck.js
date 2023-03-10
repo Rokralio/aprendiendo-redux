@@ -7,15 +7,17 @@ let initialData = {
   fetching: false,
   array: [],
   current: {},
-  favorites: []
+  favorites: [],
+  nextPage: 1
 }
 
-let URL = "https://rickandmortyapi.com/api/character";
+// let URL = "https://rickandmortyapi.com/api/character";
 
 let client = new ApolloClient({
   uri: "https://rickandmortyapi.com/graphql"
 })
 
+let UPDATE_PAGE = 'UPDATE_PAGE';
 
 let GET_CHARACTERS = 'GET_CHARACTERS';
 let GET_CHARACTERS_SUCCESS = 'GET_CHARACTERS_SUCCESS';
@@ -31,6 +33,9 @@ let GET_FAVS_ERROR = 'GET_FAVS_ERROR'
 //Reducer
 export default function reducer (state = initialData, action) {
   switch (action.type) {
+    case UPDATE_PAGE:
+      return { ...state, nextPage: action.payload }
+
     case GET_FAVS_SUCCESS:
       return { ...state, fetching: false, favorites: action.payload }
     case GET_FAVS_ERROR:
@@ -94,6 +99,10 @@ export let addToFavoritesAction = ()=> (dispatch, getState)=>{
 export let removeCharacterAction = () => (dispatch, getState)=>{
   let { array } = getState().characters
   array.shift()
+  if(!array.length){
+    getCharactersAction()(dispatch, getState)
+    return
+  }
   dispatch({
     type: REMOVE_CHARACTER,
     payload: [...array]
@@ -102,8 +111,13 @@ export let removeCharacterAction = () => (dispatch, getState)=>{
 
 export let getCharactersAction = () => (dispatch, getState) =>{
   let query = gql`
-    {
-      characters{
+    query Data($page:Int){
+      characters (page:$page){
+        info{
+          pages
+          next
+          prev
+        }
         results{
           name
           image
@@ -115,8 +129,10 @@ export let getCharactersAction = () => (dispatch, getState) =>{
   dispatch({
     type: GET_CHARACTERS,
   })
+  let { nextPage } = getState().characters
   return client.query({
-    query: query
+    query,
+    variables: { page: nextPage }
   })
   .then(({ data, error })=>{
     if(error){
@@ -129,6 +145,10 @@ export let getCharactersAction = () => (dispatch, getState) =>{
     dispatch({
       type: GET_CHARACTERS_SUCCESS,
       payload: data.characters.results
+    })
+    dispatch({
+      type: UPDATE_PAGE,
+      payload: data.characters.info.next ? data.characters.info.next : 1
     })
   })
   // dispatch({
